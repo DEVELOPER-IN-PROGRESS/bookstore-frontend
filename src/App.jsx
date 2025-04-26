@@ -8,6 +8,7 @@ import { useState, useEffect } from 'react'
 import AllBooks from './users/pages/AllBooks';
 import Careers from './users/pages/Careers';
 import Contact from './users/pages/Contact'
+import Profile from './users/pages/Profile';
 
 function App() {
   const [ isLoading,setIsLoading] = useState(false)
@@ -26,6 +27,7 @@ function App() {
       <Route path='/allbooks' element={<AllBooks />} />
       <Route path='/careers' element={<Careers />} />
       <Route path='/contact' element={<Contact />} />
+      <Route path='/profile' element={<Profile />} />
        <Route path='*' element={<PageNotFound/>} />
 	  </Routes>
     </>
