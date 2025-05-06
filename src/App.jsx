@@ -2,7 +2,7 @@ import './App.css'
 import { Route , Routes  } from 'react-router-dom'
 import Home from './users/pages/Home';
 import PageNotFound from './pages/PageNotFound';
-import Auth from './pages/auth';
+import Auth from './pages/Auth';
 import Preloader from './components/Preloader'
 import { useState, useEffect } from 'react'
 import AllBooks from './users/pages/AllBooks';

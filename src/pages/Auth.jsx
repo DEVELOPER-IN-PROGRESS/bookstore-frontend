@@ -1,9 +1,53 @@
-import React from 'react'
+import React,{useState} from 'react'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome' ;
 import { faUser } from '@fortawesome/free-solid-svg-icons';
-import { Link } from 'react-router-dom';
+import { Link , useNavigate } from 'react-router-dom';
+import { ToastContainer, toast } from 'react-toastify';
+import { registerApi , loginApi } from '../../services/allApi';
 
 function Auth({register}) {
+  const [userDetails, setUserDetails] = useState({
+	username:"",
+	email: "",
+	password: "",
+  });
+ const navigate = useNavigate();
+
+  const handleRegister = async() => {
+	const {username , password , email } = userDetails
+	if(!username || !password || !email){
+		toast.error('please fill the complete details')
+	}
+	// API call
+	else{
+		const result = await registerApi({username , email , password})
+
+		if (result.status == 200){
+			toast.success('Registration successful');
+			setUserDetails({username:"", email:"", password:"" })
+
+			setTimeout(()=>{navigate('/login')},1000);
+			
+		}else if(result.status == 409){
+			toast.error(result.response.data)
+			setUserDetails({username:"", email:"", password:"" })
+		}else{
+			toast.warning('Something went wrong')
+		}
+	}
+  }
+
+  const handleLogin = async() => {
+	const { email , password } = userDetails;
+	if(!email || !password ){
+		toast.error('please fill all the fields')
+	}else{
+		const result = await loginApi({password,email});
+		console.log(result);
+
+	}
+  }
+
   return (
     <div id="login" className="">
  	  <div className="md:grid grid-cols-3">
@@ -24,14 +68,14 @@ function Auth({register}) {
 
 	  		 	{ register &&
 				 <div className="mb-5 w-full mt-8" >
-					<input type="text" placeholder="username"  className="p-2  rounded placeholder-gray-600	bg-white w-full" />
+					<input type="text" onChange={(e)=>{setUserDetails({ ...userDetails, username:e.target.value }) }} placeholder="username"  className="p-2  rounded placeholder-gray-600	bg-white w-full" />
 				 </div>
 	            }
 	  			<div className="mb-3 w-full mt-4">
-	  				<input type="text" placeholder="email id" className="p-2 rounded  placeholder-gray-600 bg-white w-full" />
+	  				<input type="text" onChange={(e)=>{setUserDetails({ ...userDetails, email:e.target.value }) }} placeholder="email id" className="p-2 rounded  placeholder-gray-600 bg-white w-full" />
 				</div>
 	  			<div className="mb-3 w-full mt-4">
-	 				 <input type="text" placeholder="password" className="p-2 rounded placeholder-gray-600 bg-white w-full" />
+	 				 <input type="text" onChange={(e)=>{setUserDetails({ ...userDetails, password :e.target.value }) }} placeholder="password" className="p-2 rounded placeholder-gray-600 bg-white w-full" />
 	  			</div>
 
 			       <div className="mb-5 mt-3 w-full flex justify-between " >
@@ -44,11 +88,11 @@ function Auth({register}) {
 				{
 				!register?
 				<div className="mb-5 mt-3 w-full" >
-					<button className="bg-green-500 text-white w-full p-3 rounded capitalize"> Login </button>
+					<button type="button" onClick={handleLogin} className="bg-green-500 text-white w-full p-3 rounded capitalize"> Login </button>
 				</div>
 				:
 				<div className="mb-5 mt-3 w-full" >
-					<button className="bg-green-500 text-white w-full p-3 rounded capitalize"> Register </button>
+					<button type="button" onClick={handleRegister} className="bg-green-500 text-white w-full p-3 rounded capitalize"> Register </button>
 				</div>
 				}
 
@@ -75,6 +119,7 @@ function Auth({register}) {
 	  	</div>
 	  	<div></div>
 	  </div>
+	  <ToastContainer theme="colored" position="top-center" autoClose={2000} />
     </div>
   )
 }

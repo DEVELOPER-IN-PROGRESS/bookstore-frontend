@@ -40,6 +40,7 @@ function Header(){
 			</div>
 
 	 		{
+				/*
 			!dropdown &&
 			<div className="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black/5 focus:outline-hidden" role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabindex="-1">
 				<div className="py-1" role="none">
@@ -49,6 +50,7 @@ function Header(){
 				<button type="submit" className="block w-full px-4 py-2 text-left text-sm text-gray-700" role="menuitem" tabindex="-1" id="menu-item-3">Sign out</button>
 				</div>
 			</div>
+			*/
 			}
 	 	</div>
 
