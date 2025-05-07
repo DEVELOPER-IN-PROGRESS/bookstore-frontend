@@ -3,7 +3,9 @@ import {FontAwesomeIcon} from '@fortawesome/react-fontawesome' ;
 import { faUser } from '@fortawesome/free-solid-svg-icons';
 import { Link , useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
-import { registerApi , loginApi } from '../../services/allApi';
+import { registerApi , loginApi, googleLoginApi } from '../../services/allApi';
+import { GoogleLogin } from '@react-oauth/google';
+import { jwtDecode } from "jwt-decode";
 
 function Auth({register}) {
   const [userDetails, setUserDetails] = useState({
@@ -27,7 +29,7 @@ function Auth({register}) {
 			setUserDetails({username:"", email:"", password:"" })
 
 			setTimeout(()=>{navigate('/login')},1000);
-			
+
 		}else if(result.status == 409){
 			toast.error(result.response.data)
 			setUserDetails({username:"", email:"", password:"" })
@@ -45,7 +47,39 @@ function Auth({register}) {
 		const result = await loginApi({password,email});
 		console.log(result);
 
+		if (result.status == 200){
+			toast.success("login successful")
+			sessionStorage.setItem("existingUser",JSON.stringify(result.data.existingUser))
+			sessionStorage.setItem("token",result.data.token)
+
+			// setTimeout(()=>{},1500);
+			if( result.data.existingUser.email == "admin123@gmail.com"){
+				console.log('you are the admin')
+				navigate('/admin-home')
+			}else{
+				navigate('/')
+			}
+		}
 	}
+  }
+
+  const handleGoogleLogin = async(credentialResponse) => {
+	const details = jwtDecode(credentialResponse.credential)
+	console.log(details)
+
+	//since we are logging to the website via the google account we set a dummy password and pass it via the common API
+	// as the password is a required field as per our schema
+
+	const result = await googleLoginApi({username:details.name, email:details.email ,
+	password:'googlepassword', photo:details.picture})
+	console.log(result);
+
+	if(result.status ==200){
+		toast.success("login succesful")
+		sessionStorage.setItem("existingUser",JSON.stringify(result.data.existingUser))
+		sessionStorage.setItem("token",result.data.token)
+	}
+		
   }
 
   return (
@@ -78,7 +112,7 @@ function Auth({register}) {
 	 				 <input type="text" onChange={(e)=>{setUserDetails({ ...userDetails, password :e.target.value }) }} placeholder="password" className="p-2 rounded placeholder-gray-600 bg-white w-full" />
 	  			</div>
 
-			       <div className="mb-5 mt-3 w-full flex justify-between " >
+			    <div className="mb-5 mt-3 w-full flex justify-between " >
 				  <p className="text-amber-300 " style={{ fontSize: '10px'}}>Never share your password with others </p>
 				{
 				 !register  &&  <p className="underline text-white" style={{ fontSize: '10px'}}> Forgot Password </p>
@@ -96,14 +130,22 @@ function Auth({register}) {
 				</div>
 				}
 
-
-
 				{
 				!register &&
 				<>
 				<p className="text-white"> -------------------------- or -------------------------</p>
 				<div className="mb-5 mt-3 w-full" >
-					<button className="bg-white text-black w-full p-3 rounded capitalize">sign in with google </button>
+				<GoogleLogin
+					onSuccess={credentialResponse => {
+						console.log(credentialResponse);
+						handleGoogleLogin(credentialResponse);
+					}}
+					onError={() => {
+						toast.error('Something went Wrong')
+						console.log('Login Failed');
+					}}
+				/>;
+					{/* <button className="bg-white text-black w-full p-3 rounded capitalize">sign in with google </button> */}
 				</div>
 				</>
 				}
@@ -120,6 +162,7 @@ function Auth({register}) {
 	  	<div></div>
 	  </div>
 	  <ToastContainer theme="colored" position="top-center" autoClose={2000} />
+
     </div>
   )
 }

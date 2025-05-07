@@ -1,12 +1,20 @@
-import React,{ useState } from 'react'
+import React,{ useState , useEffect } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFacebook, faInstagram, faXTwitter} from '@fortawesome/free-brands-svg-icons';
-import { faBars } from '@fortawesome/free-solid-svg-icons';
+import { faBars, faCircleUser } from '@fortawesome/free-solid-svg-icons';
 import { Link } from 'react-router-dom';
 
 function Header(){
 	const [ status , setStatus ] = useState(true);
 	const [ dropdown , setDropdown ] = useState(true);
+	const [token, setToken] = useState("");
+
+	useEffect(()=>{
+		if(sessionStorage.getItem("token")){
+			const token = sessionStorage.getItem("token")
+			setToken(token);
+		}
+	},[])
 
  return(
  <>
@@ -23,15 +31,15 @@ function Header(){
 	   <FontAwesomeIcon icon={faFacebook} />
 	   <FontAwesomeIcon icon={faInstagram} />
 
-	    <Link to={'/login'}>
-		 {/*	<button className="">
-				<FontAwesomeIcon  className="me-2" icon={faCircleUser} />
- 				Login
-	       	</button>
-	 		*/
-		}
-	    </Link>
+		{
+	    !token?
+		<Link to={'/login'}>
 
+		 	<button className="">
+				<FontAwesomeIcon  className="me-2" icon={faCircleUser} />
+	       	</button>
+	    </Link>
+		:
 		<div className="relative inline-block text-left">
 			<div>
 				<button onClick={()=>{ setDropdown(!dropdown) }} type="button" className="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-xs ring-1 ring-gray-300 ring-inset hover:bg-gray-50" id="menu-button" aria-expanded="true" aria-haspopup="true">
@@ -40,7 +48,6 @@ function Header(){
 			</div>
 
 	 		{
-				/*
 			!dropdown &&
 			<div className="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black/5 focus:outline-hidden" role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabindex="-1">
 				<div className="py-1" role="none">
@@ -50,9 +57,9 @@ function Header(){
 				<button type="submit" className="block w-full px-4 py-2 text-left text-sm text-gray-700" role="menuitem" tabindex="-1" id="menu-item-3">Sign out</button>
 				</div>
 			</div>
-			*/
 			}
 	 	</div>
+		}
 
 	</div>
   </div>
@@ -63,11 +70,11 @@ function Header(){
 	        </span>
 
 		<Link to={'/login'}>
-			 {/* <button className="">
+		{ <button className="">
 				<FontAwesomeIcon icon={faCircleUser} />
  				Login
 	       	</button>
-	 		*/ }
+	 	}
 
 
 	    </Link>
