@@ -1,14 +1,106 @@
-import React,{useState} from 'react'
+import {useState, useEffect} from 'react'
 import Header from '../components/Header'
 import Footer from '../../components/Footer'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCircleCheck, faSquarePlus } from '@fortawesome/free-solid-svg-icons'
 import EditProfile from '../components/EditProfile'
+import { uploadBookApi } from '../../../services/allApi'
+import {toast , ToastContainer } from 'react-toastify'
 
 function Profile() {
   const [sellstatus , setSellstatus] = useState(true);
   const [bookstatus , setBookstatus] = useState(false);
   const [purchasestatus , setPurchasestatus] = useState(false);
+  const [bookDetails , setBookDetails] = useState({
+    title:"",
+    author:"",
+    noofpages:"",
+    imageUrl:"",
+    price :"",
+    dprice:"",
+    abstract:"",
+    publisher:"",
+    language:"",
+    isbn:"",
+    category:"",
+    uploadedImg: [],
+  });
+
+  const [imagePreview, setImagePreview] = useState(null)
+  const [previewList  , setPreviewList] = useState([]);
+  const [token,setToken] = useState("")
+
+  console.log(bookDetails)
+  const [isOpen , setIsOpen]  = useState(false);
+
+  const handleUpload = (e) => {
+    console.log(e)
+    console.log(e.target.files[0])
+
+    const fileArray = bookDetails.uploadedImg
+    fileArray.push(e.target.files[0])
+
+    const url  = URL.createObjectURL(e.target.files[0])
+    console.log(url)
+    setImagePreview(url)
+
+    setBookDetails({...bookDetails,uploadedImg:fileArray})
+
+    const previewArray = previewList
+    previewArray.push(url)
+    setPreviewList(previewArray)
+  }
+
+  const handleReset = () => {
+    setPreviewList([])
+    setBookDetails({
+      title:"",
+      author:"",
+      noofpages:"",
+      imageUrl:"",
+      price :"",
+      dprice:"",
+      abstract:"",
+      publisher:"",
+      language:"",
+      isbn:"",
+      category:"",
+      uploadedImg: [],
+    })
+  }
+
+  const handleSubmit = async() => {
+    const { title,  author,noofpages, imageUrl, price , dprice, abstract,
+      publisher, language, isbn, category, uploadedImg } = bookDetails;
+
+    if ( !title ||  !author || !noofpages || !imageUrl || !price  || !dprice || !abstract ||
+      !publisher || !language || !isbn || !category || !uploadedImg.length ){
+       toast.info('Please fill the fields completely')
+    }else{
+      const reqHeader = {
+        "authorization": `Bearer ${token}`
+      }
+
+      const reqBody = new FormData()
+
+      for (let key in bookDetails) {
+         if(key != 'uploadedImg'){
+            reqBody.append(key,bookDetails[key])
+         }else{
+          bookDetails.uploadedImg.forEach( item => reqBody.append("uploadedImg",item) )
+         }
+      }
+
+      const result = await uploadBookApi(reqHeader,reqBody)
+    }
+
+  }
+
+  useEffect(()=>{
+    if(sessionStorage.getItem("token")){
+      setToken(sessionStorage.getItem("token"))
+    }
+  },[])
 
   return (
     <>
@@ -52,71 +144,99 @@ function Profile() {
                 <div className="grid grid-cols-2 mt-5 w-full">
                       <div className="pe-3">
                         <div className="mb-3">
-                            <input placeholder='title' type="text" className="p-2 bg-white rounded placeholder-gray-500 w-full rounded" />
+                            <input placeholder='title' type="text" value={bookDetails.title} onChange={(e)=>setBookDetails({...bookDetails, title:e.target.value})} className="p-2 bg-white rounded placeholder-gray-500 w-full rounded" />
                         </div>
 
                         <div className="mb-3">
-                            <input placeholder='Author' type="text" className="p-2 bg-white rounded placeholder-gray-500 w-full rounded" />
+                            <input placeholder='Author' type="text" value={bookDetails.author} onChange={(e)=>setBookDetails({...bookDetails, author:e.target.value})} className="p-2 bg-white rounded placeholder-gray-500 w-full rounded" />
                         </div>
 
                         <div className="mb-3">
-                            <input placeholder='No of Pages' type="text" className="p-2 bg-white rounded placeholder-gray-500 w-full rounded" />
+                            <input placeholder='No of Pages' type="text" value={bookDetails.noofpages} onChange={(e)=>setBookDetails({...bookDetails,noofpages :e.target.value})} className="p-2 bg-white rounded placeholder-gray-500 w-full rounded" />
                         </div>
 
                         <div className="mb-3">
-                            <input placeholder='Image Url' type="text" className="p-2 bg-white rounded placeholder-gray-500 w-full rounded" />
+                            <input placeholder='Image Url' type="text" value={bookDetails.imageUrl} onChange={(e)=>setBookDetails({...bookDetails, imageUrl:e.target.value})} className="p-2 bg-white rounded placeholder-gray-500 w-full rounded" />
                         </div>
 
                         <div className="mb-3">
-                            <input placeholder='Price' type="text" className="p-2 bg-white rounded placeholder-gray-500 w-full rounded" />
+                            <input placeholder='Price' type="text" value={bookDetails.price} onChange={(e)=>setBookDetails({...bookDetails, price:e.target.value})} className="p-2 bg-white rounded placeholder-gray-500 w-full rounded" />
                         </div>
 
                         <div className="mb-3">
-                            <input placeholder='Discount Price' type="text" className="p-2 bg-white rounded placeholder-gray-500 w-full rounded" />
+                            <input placeholder='Discount Price' type="text" value={bookDetails.dprice} onChange={(e)=>setBookDetails({...bookDetails, dprice:e.target.value})} className="p-2 bg-white rounded placeholder-gray-500 w-full rounded" />
                         </div>
 
                         <div className="mb-3">
-                            <textarea placeholder='Abstract' rows={5} type="text" className="p-2 bg-white rounded placeholder-gray-500 w-full rounded"></textarea>
+                            <textarea placeholder='Abstract' rows={5} type="text" value={bookDetails.abstract} onChange={(e)=>setBookDetails({...bookDetails, abstract:e.target.value})} className="p-2 bg-white rounded placeholder-gray-500 w-full rounded"></textarea>
                         </div>
 
                       </div>
 
                       <div className="ps-3">
                         <div className="mb-3">
-                            <input placeholder='Publisher' type="text" className="p-2 bg-white rounded placeholder-gray-500 w-full rounded" />
+                            <input placeholder='Publisher' type="text" value={bookDetails.publisher} onChange={(e)=>setBookDetails({...bookDetails, publisher:e.target.value})} className="p-2 bg-white rounded placeholder-gray-500 w-full rounded" />
                         </div>
 
                         <div className="mb-3">
-                            <input placeholder='Language' type="text" className="p-2 bg-white rounded placeholder-gray-500 w-full rounded" />
+                            <input placeholder='Language' type="text" value={bookDetails.language} onChange={(e)=>setBookDetails({...bookDetails, language:e.target.value})} className="p-2 bg-white rounded placeholder-gray-500 w-full rounded" />
                         </div>
 
                         <div className="mb-3">
-                            <input placeholder='ISBN' type="text" className="p-2 bg-white rounded placeholder-gray-500 w-full rounded" />
+                            <input placeholder='ISBN' type="text" value={bookDetails.isbn} onChange={(e)=>setBookDetails({...bookDetails, isbn:e.target.value})} className="p-2 bg-white rounded placeholder-gray-500 w-full rounded" />
                         </div>
 
                         <div className="mb-3">
-                            <input placeholder='Category' type="text" className="p-2 bg-white rounded placeholder-gray-500 w-full rounded" />
+                            <input placeholder='Category' type="text" value={bookDetails.category} onChange={(e)=>setBookDetails({...bookDetails, category:e.target.value})} className="p-2 bg-white rounded placeholder-gray-500 w-full rounded" />
                         </div>
 
                         <div className="mb-3 flex justify-center items-center w-full mt-10">
-                          <label htmlFor="fileupload">
-                            <input id="fileupload" placeholder='Category' type="file" className="hidden" />
+                          {
+                            !imagePreview?
+                            <label htmlFor="fileupload">
+                            <input id="fileupload" onChange={(e)=>{handleUpload(e)}} placeholder='Category' type="file" className="hidden" />
                             <img src="https://img.freepik.com/premium-vector/file-upload-vector-icon-design-illustration_1174953-75051.jpg" alt="no image" className="w-[200px] h-[200px] rounded-[50%]" />
                             </label>
+                            :
+                            <img src={imagePreview} alt="no image" className="w-[200px] h-[200px]" />
+                            }
                         </div>
-                        <div className="flex justify-center items-center w-full">
-                          <img src="https://m.media-amazon.com/images/I/51071nF0pTL._SY522_.jpg" alt="" className="w-[70px]"/>
-                            <FontAwesomeIcon icon={faSquarePlus} className="fa-2x shadow ms-3 text-gray-400 "/>
-                        </div>
+
+                        {
+                          imagePreview
+                           &&
+                          <div className="flex justify-center items-center w-full">
+                            {/* <div className='overflow-x-auto w-9/12 flex justify-center items-center'> */}
+                              {
+                                previewList?.map(  (url,idx) => (
+                                  <img src={url} key={`previewimage-${idx}`} alt="no image" className="w-[70px] h-[70px] mx-2"/>
+                                ))
+                              }
+                            {/* </div > */}
+
+
+                            {
+                            (imagePreview.length < 3)
+                            &&
+                            <label htmlFor="fileupload">
+                            <input id="fileupload" onChange={(e)=>{handleUpload(e)}} placeholder='Category' type="file" className="hidden" />
+                             <FontAwesomeIcon icon={faSquarePlus} className="fa-2x shadow ms-3 text-gray-400 "/>
+                            {/* <img src="https://img.freepik.com/premium-vector/file-upload-vector-icon-design-illustration_1174953-75051.jpg" alt="no image" className="w-[70px] h-[70px] " /> */}
+                            </label>
+
+                            }
+
+                          </div>
+                        }
 
                       </div>
                 </div>
 
                 <div className=" px-4 py-3 sm:flex sm:flex-row justify-end sm:px-6">
-                  <button type="button" className="mt-3 inline-flex w-full justify-center rounded-md bg-red-500 px-3 py-2 text-sm font-semibold text-white shadow-xs ring-1 ring-gray-300 ring-inset hover:bg-gray-50 hover:text-red-400 sm:mt-0 sm:w-auto">Reset
+                  <button type="button" onClick={handleReset} className="mt-3 inline-flex w-full justify-center rounded-md bg-red-500 px-3 py-2 text-sm font-semibold text-white shadow-xs ring-1 ring-gray-300 ring-inset hover:bg-gray-50 hover:text-red-400 sm:mt-0 sm:w-auto">Reset
                   </button>
 
-                    <button type="button" className="mt-3 md:mt-0 inline-flex w-full justify-center rounded-md bg-green-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-white border hover:border-green-500 hover:text-green-500 sm:ml-3 sm:w-auto">Submit</button>
+                    <button type="button" onClick={handleSubmit} className="mt-3 md:mt-0 inline-flex w-full justify-center rounded-md bg-green-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-white border hover:border-green-500 hover:text-green-500 sm:ml-3 sm:w-auto">Submit</button>
 
             </div>
             </div>
@@ -154,8 +274,9 @@ function Profile() {
         {
           purchasestatus &&  <div>purchase status</div>
         }
-
+        <ToastContainer theme="colored" position="top-center" autoClose={2000} />
         </div>
+
       <Footer />
     </>
   )

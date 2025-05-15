@@ -13,3 +13,10 @@ export const loginApi = async(reqBody) => {
 export const googleLoginApi = async(reqBody) => {
     return await commonApi('POST', `${serverUrl}/google-login`, reqBody)
 }
+
+// -------------------------------- users  api ------------------------------------
+
+// upload a  book
+export const uploadBookApi = async(reqBody,reqHeader) => {
+    return await commonApi('POST',`${serverUrl}/add-books`,reqBody,reqHeader)
+}
