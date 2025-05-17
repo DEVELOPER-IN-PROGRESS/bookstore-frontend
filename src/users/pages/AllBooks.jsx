@@ -1,18 +1,49 @@
-import React, {useState} from 'react'
+import React, {useState,useEffect} from 'react'
 import Header from '../components/Header'
 import Footer from '../../components/Footer'
 import { Link } from 'react-router-dom'
 import { FontAwesomeIcon }from '@fortawesome/react-fontawesome'
 import { faBars } from '@fortawesome/free-solid-svg-icons'
+import { getAllBookApi  } from '../../../services/allApi'
 
 function AllBooks() {
     const [status , setStatus] = useState(true)
+    const [token,setToken] = useState("")
+    const [allBooks, setAllBooks] = useState([])
+
+    const getAllBooks = async(TOKEN) => {
+        const reqHeader = {
+            "Authorization": `Bearer ${TOKEN}`
+        }
+
+        const result = await getAllBookApi(reqHeader)
+        // console.log(result)
+
+        if(result.status == 200){
+            setAllBooks(result.data)
+        }
+    }
+
+    // console.log(allBooks)
+
+    useEffect(()=>{
+        const TOKEN = sessionStorage.getItem("token")
+        if(TOKEN){
+          setToken(TOKEN)
+          getAllBooks(TOKEN)
+        }
+      },[])
+
+
   return (
     <>
     <Header/>
         <h1 className="text-center my-4 text-3xl"> Collections</h1>
 
         {/* When user logged in  */}
+        {
+        token
+          &&
         <div className="">
             <div className="">
                 <div className="mx-auto my-5 w-[50%] flex items-stretch h-[50px] justify-center">
@@ -82,7 +113,29 @@ function AllBooks() {
                 <div className="w-full bg-white flex justify-center items-center flex-col md:p-10 p-5">
 
                     <div className="md:grid grid-cols-4 w-full gap-x-2 gap-y-5 mt-3">
-                        <div className="p-3 shadow-xl ">
+                        {
+                            allBooks?.length>0?
+                            allBooks?.map( item => (
+                                <div key={item._id} className="p-3 shadow-xl ">
+                                    <Link to="">
+                                    <img src={item.imageUrl} alt="no image" style={{ width:'100%' ,height:'300px' }} className=""/>
+                                    </Link>
+                                    <div className="flex flex-col justify-center items-center mt-3">
+                                    <h2 className="text-2xl capitalize text-center"> {item?.title.slice(0,20)} </h2>
+                                    <p className="text-blue-800"> { item?.author.slice(0,20) } </p>
+                                    <button className="bg-blue-600 py-2 text-white hover:bg-white hover:text-blue-500 px-2 border hover:border-blue-600 w-full mt-2">
+                                        ${item.dprice}
+                                    </button>
+                                    </div>
+                                </div>
+                            ))
+                            :
+                            <p>No Books</p>
+                        }
+
+
+
+                        {/* <div className="p-3 shadow-xl ">
                         <img src="https://rukminim2.flixcart.com/image/850/1000/xif0q/book/z/l/s/the-lord-of-the-rings-original-imaggtnpdjzb8qhg.jpeg?q=90&crop=false" alt="no image" style={{ width:'100%' ,height:'300px' }} className=""/>
                                 <div className="flex flex-col justify-center items-center mt-3">
                             <h2 className="text-2xl capitalize text-center"> the lord of the rings </h2>
@@ -107,16 +160,7 @@ function AllBooks() {
                             <p className="text-blue-800"> J.R.R Tolkien</p>
                             <button className="bg-blue-600 py-2 text-white hover:bg-white hover:text-blue-500 px-2 border hover:border-blue-600 w-full mt-2">$18</button>
                             </div>
-                        </div>
-
-                        <div className="p-3 shadow-xl ">
-                        <img src="https://rukminim2.flixcart.com/image/850/1000/xif0q/book/z/l/s/the-lord-of-the-rings-original-imaggtnpdjzb8qhg.jpeg?q=90&crop=false" alt="no image" style={{ width:'100%' ,height:'300px' }} className=""/>
-                                <div className="flex flex-col justify-center items-center mt-3">
-                            <h2 className="text-2xl capitalize text-center"> the lord of the rings </h2>
-                            <p className="text-blue-800"> J.R.R Tolkien</p>
-                            <button className="bg-blue-600 py-2 text-white hover:bg-white hover:text-blue-500 px-2 border hover:border-blue-600 w-full mt-2">$18</button>
-                            </div>
-                        </div>
+                        </div> */}
 
                     </div>
 
@@ -131,8 +175,11 @@ function AllBooks() {
                 </div>
             </div>
         </div>
+        }
 
         {/* Not Logged in  */}
+        {
+        !token &&
         <div className="grid grid-cols-3">
             <div></div>
             <div>
@@ -144,6 +191,7 @@ function AllBooks() {
             </div>
             <div></div>
         </div>
+        }
 
     <Footer/>
     </>

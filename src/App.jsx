@@ -13,6 +13,7 @@ import AdminHome from './admin/pages/AdminHome';
 import AdminBooks from './admin/pages/AdminBooks'
 import AdminCareers from './admin/pages/AdminCareers'
 import AdminSettings from './admin/pages/AdminSettings'
+import ViewBooks from './users/pages/ViewBooks';
 
 function App() {
   const [ isLoading,setIsLoading] = useState(false)
@@ -31,6 +32,7 @@ function App() {
       <Route path='/allbooks' element={<AllBooks />} />
       <Route path='/careers' element={<Careers />} />
       <Route path='/contact' element={<Contact />} />
+      <Route path="/view-books/:id" element={<ViewBooks />}/>
       <Route path='/profile' element={<Profile />} />
       <Route path="/admin-home" element={  isLoading? <AdminHome/> :<Preloader /> } />
       <Route path='/admin-books' element={<AdminBooks />} />

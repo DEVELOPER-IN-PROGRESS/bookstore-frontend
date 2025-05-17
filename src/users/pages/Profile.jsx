@@ -26,7 +26,7 @@ function Profile() {
     uploadedImg: [],
   });
 
-  const [imagePreview, setImagePreview] = useState(null)
+  const [imagePreview, setImagePreview] = useState('')
   const [previewList  , setPreviewList] = useState([]);
   const [token,setToken] = useState("")
 
@@ -78,7 +78,7 @@ function Profile() {
        toast.info('Please fill the fields completely')
     }else{
       const reqHeader = {
-        "authorization": `Bearer ${token}`
+        "Authorization": `Bearer ${token}`
       }
 
       const reqBody = new FormData()
@@ -87,11 +87,17 @@ function Profile() {
          if(key != 'uploadedImg'){
             reqBody.append(key,bookDetails[key])
          }else{
-          bookDetails.uploadedImg.forEach( item => reqBody.append("uploadedImg",item) )
+          // the "uploadedImages" key should exactly match what the multer middleware is expecting
+          bookDetails.uploadedImg.forEach( item => reqBody.append("uploadedImages",item) )
          }
       }
 
       const result = await uploadBookApi(reqHeader,reqBody)
+      console.log(result)
+
+      if(result.status ==401){
+
+      }
     }
 
   }
@@ -215,8 +221,9 @@ function Profile() {
                             {/* </div > */}
 
 
+
                             {
-                            (imagePreview.length < 3)
+                            (imagePreview.length > 3)
                             &&
                             <label htmlFor="fileupload">
                             <input id="fileupload" onChange={(e)=>{handleUpload(e)}} placeholder='Category' type="file" className="hidden" />

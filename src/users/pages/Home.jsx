@@ -1,10 +1,26 @@
-import React from 'react';
+import React,{useEffect, useState} from 'react';
 import Header from '../components/Header';
 import Footer from '../../components/Footer';
 import  { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
 import { Link } from 'react-router-dom';
+import { homeBookApi} from '../../../services/allApi';
+
 function Home() {
+
+ const [homeBook, setHomeBook] = useState([])
+ const getAllHomeBooks = async() => {
+	const result = await homeBookApi()
+	if(result.status == 200){
+		setHomeBook(result.data)
+	}
+ }
+
+ console.log(homeBook)
+ useEffect(()=> {
+	getAllHomeBooks()
+ },[])
+
   return (
     <>
 	  <Header />
@@ -31,7 +47,26 @@ function Home() {
 	  	<p className="capitalize text-center text-2xl"> Explore our latest collection </p>
 
 	  <div className="md:grid grid-cols-4 w-full gap-x-2 gap-y-5 mt-3">
-	  	<div className="p-3 shadow-xl ">
+
+		{
+			homeBook?.length > 0?
+			homeBook.map( (item) => (
+				<div className="p-3 shadow-xl" key={item._id}>
+					<img src={item.imageUrl} alt="no image" style={{ width:'100%' ,height:'300px' }} className=""/>
+					<div className="flex flex-col justify-center items-center mt-3">
+						<h2 className="text-2xl capitalize"> {item.title} </h2>
+						<p className="text-blue-800">{item.author}</p>
+						<p> {item.dprice} </p>
+					</div>
+				</div>
+			))
+			:
+			<>
+			<p>Loading</p>
+			</>
+		}
+
+	  	{/* <div className="p-3 shadow-xl ">
 	  	  <img src="https://rukminim2.flixcart.com/image/850/1000/xif0q/book/z/l/s/the-lord-of-the-rings-original-imaggtnpdjzb8qhg.jpeg?q=90&crop=false" alt="no image" style={{ width:'100%' ,height:'300px' }} className=""/>
 	              <div className="flex flex-col justify-center items-center mt-3">
 	   		<h2 className="text-2xl capitalize"> the lord of the rings </h2>
@@ -49,7 +84,7 @@ function Home() {
 	  	      </div>
 	  	</div>
 
-	       <div className="p-3 shadow-xl ">
+	    <div className="p-3 shadow-xl ">
 	  	  <img src="https://rukminim2.flixcart.com/image/850/1000/xif0q/book/z/l/s/the-lord-of-the-rings-original-imaggtnpdjzb8qhg.jpeg?q=90&crop=false" alt="no image" style={{ width:'100%' ,height:'300px' }} className=""/>
 	              <div className="flex flex-col justify-center items-center mt-3">
 	   		<h2 className="text-2xl capitalize"> the lord of the rings </h2>
@@ -58,14 +93,14 @@ function Home() {
 	  	      </div>
 	  	</div>
 
-	       <div className="p-3 shadow-xl ">
+	    <div className="p-3 shadow-xl ">
 	  	  <img src="https://rukminim2.flixcart.com/image/850/1000/xif0q/book/z/l/s/the-lord-of-the-rings-original-imaggtnpdjzb8qhg.jpeg?q=90&crop=false" alt="no image" style={{ width:'100%' ,height:'300px' }} className=""/>
 	              <div className="flex flex-col justify-center items-center mt-3">
 	   		<h2 className="text-2xl capitalize"> the lord of the rings </h2>
 	  		<p className="text-blue-800"> J.R.R Tolkien</p>
 	  		<p> $18 </p>
 	  	      </div>
-	  	</div>
+	  	</div> */}
 
 	 </div>
 
