@@ -1,38 +1,52 @@
-import React, {useState,useEffect} from 'react'
+import React, {useState,useEffect, useContext} from 'react'
 import Header from '../components/Header'
 import Footer from '../../components/Footer'
 import { Link } from 'react-router-dom'
 import { FontAwesomeIcon }from '@fortawesome/react-fontawesome'
 import { faBars } from '@fortawesome/free-solid-svg-icons'
 import { getAllBookApi  } from '../../../services/allApi'
+import { searchKeyContext } from '../../context/contextShare'
 
 function AllBooks() {
-    const [status , setStatus] = useState(true)
+    const [status , setStatus] = useState(false)
     const [token,setToken] = useState("")
     const [allBooks, setAllBooks] = useState([])
+    // store the filtered data
+    const [tempArray, setTempArray] = useState([])
 
-    const getAllBooks = async(TOKEN) => {
+    const {searchKey, setSearchKey}  = useContext(searchKeyContext)
+
+    const getAllBooks = async(TOKEN,searchKey) => {
         const reqHeader = {
             "Authorization": `Bearer ${TOKEN}`
         }
 
-        const result = await getAllBookApi(reqHeader)
+        const result = await getAllBookApi(searchKey, reqHeader)
         // console.log(result)
 
         if(result.status == 200){
             setAllBooks(result.data)
+            setTempArray(result.data)
         }
     }
 
-    // console.log(allBooks)
+    // console.log({searchKey, setSearchKey})
+
+    const filter = (category) => {
+        console.log(category)
+        category == "all-books"?
+        setAllBooks( tempArray )
+        :
+        setAllBooks( tempArray.filter( item => item.category.toLowerCase() == category.toLowerCase() ))
+    }
 
     useEffect(()=>{
         const TOKEN = sessionStorage.getItem("token")
         if(TOKEN){
           setToken(TOKEN)
-          getAllBooks(TOKEN)
+          getAllBooks(TOKEN, searchKey)
         }
-      },[])
+      },[searchKey])
 
 
   return (
@@ -48,6 +62,8 @@ function AllBooks() {
             <div className="">
                 <div className="mx-auto my-5 w-[50%] flex items-stretch h-[50px] justify-center">
                     <input
+                    value ={searchKey}
+                     onChange={(e)=> setSearchKey(e.target.value)}
                      type="text" placeholder='Search By Title'
                      className="p-2 w-full placeholder-gray-600 w-full bg-white border-radius-0 border border-dark  search"
                     />
@@ -59,7 +75,7 @@ function AllBooks() {
 
             <div className="flex flex-col  md:grid grid-cols-[1fr_4fr] px-5 md:px-10">
                 <div>
-                    <div className="flex items-center">
+                    <div className="flex justify-between items-center">
                         <h6 className="text-2xl capitalize"> Filters </h6>
                         <span className="md:hidden" onClick={()=> { setStatus(!status)}} >
                                 <FontAwesomeIcon icon={faBars}/>
@@ -67,46 +83,46 @@ function AllBooks() {
                     </div>
 
                     <div className={`radio-filter  ${status? 'hidden': 'block'} `}>
-                        <div className="mt-3">
+                        <div className="mt-3" onClick={()=> filter('all-books')}>
+                            <input type="radio" id="all-books" name="filter" />
+                            <label htmlFor="all-books" className="mt-3"> All Books </label>
+                        </div>
+
+                        <div className="mt-3" onClick={()=> filter('literary')}>
                             <input type="radio" id="Literary" name="filter" />
                             <label htmlFor="Literary" className="mt-3"> Literary Fiction </label>
                         </div>
 
-                        <div className="mt-3">
+                        <div className="mt-3" onClick={()=> filter('philosophy')}>
                             <input type="radio" id="Philosphy" name="filter" />
                             <label htmlFor="Philosophy" className="mt-3"> Philosophy </label>
                         </div>
 
-                        <div className="mt-3">
+                        <div className="mt-3" onClick={()=> filter('romance')}>
                             <input type="radio" id="Romance" name="filter" />
                             <label htmlFor="Romance" className="mt-3"> Romance </label>
                         </div>
 
-                        <div className="mt-3">
+                        <div className="mt-3" onClick={()=> filter('mystery')}>
                             <input type="radio" id="Mystery" name="filter" />
                             <label htmlFor="Mystery" className="mt-3"> Mystery/Thriller </label>
                         </div>
 
-                        <div className="mt-3">
+                        <div className="mt-3" onClick={()=> filter('politics')}>
                             <input type="radio" id="Politics" name="filter" />
                             <label htmlFor="Politics" className="mt-3"> Politics </label>
                         </div>
 
-                        <div className="mt-3">
+                        <div className="mt-3" onClick={()=> filter('self-help')}>
                             <input type="radio" id="selfhelp" name="filter" />
                             <label htmlFor="selfhelp" className="mt-3"> self-help </label>
                         </div>
 
-                        <div className="mt-3">
+                        <div className="mt-3" onClick={()=> filter('auto/biography')}>
                             <input type="radio" id="Autobiography" name="filter" />
                             <label htmlFor="Autobiography" className="mt-3"> Auto/biography </label>
                         </div>
 
-
-                        <div className="mt-3">
-                            <input type="radio" id="Autobiography" name="filter" />
-                            <label htmlFor="Autobiography" className="mt-3"> Autobiography </label>
-                        </div>
                     </div>
                 </div>
 
@@ -117,7 +133,7 @@ function AllBooks() {
                             allBooks?.length>0?
                             allBooks?.map( item => (
                                 <div key={item._id} className="p-3 shadow-xl ">
-                                    <Link to="">
+                                    <Link to={`/view-book/${item._id}`}>
                                     <img src={item.imageUrl} alt="no image" style={{ width:'100%' ,height:'300px' }} className=""/>
                                     </Link>
                                     <div className="flex flex-col justify-center items-center mt-3">

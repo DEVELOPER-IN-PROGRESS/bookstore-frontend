@@ -26,6 +26,11 @@ export const uploadBookApi = async(reqHeader,reqBody) => {
     return await commonApi('POST',`${serverUrl}/add-books`,reqBody,reqHeader)
 }
 
-export const getAllBookApi = async(reqHeader) =>{
-    return await commonApi('GET',`${serverUrl}/all-books`,'',reqHeader)
+export const getAllBookApi = async(searchKey, reqHeader) =>{
+    // query Paremeters baseurl?key=value
+    return await commonApi('GET',`${serverUrl}/all-books?search=${searchKey}`, '' ,reqHeader)
+}
+
+export const ViewSingleBookApi = async(id) => {
+    return await commonApi('GET',`${serverUrl}/view-book/${id}`) ;
 }

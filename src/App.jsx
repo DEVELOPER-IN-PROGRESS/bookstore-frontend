@@ -32,7 +32,7 @@ function App() {
       <Route path='/allbooks' element={<AllBooks />} />
       <Route path='/careers' element={<Careers />} />
       <Route path='/contact' element={<Contact />} />
-      <Route path="/view-books/:id" element={<ViewBooks />}/>
+      <Route path="/view-book/:id" element={<ViewBooks  />}/>
       <Route path='/profile' element={<Profile />} />
       <Route path="/admin-home" element={  isLoading? <AdminHome/> :<Preloader /> } />
       <Route path='/admin-books' element={<AdminBooks />} />
