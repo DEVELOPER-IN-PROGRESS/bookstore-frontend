@@ -34,3 +34,23 @@ export const getAllBookApi = async(searchKey, reqHeader) =>{
 export const ViewSingleBookApi = async(id) => {
     return await commonApi('GET',`${serverUrl}/view-book/${id}`) ;
 }
+
+export const getAllAdminBookApi = async(reqHeader) => {
+    return await commonApi('GET',`${serverUrl}/admin-books`,'',reqHeader)
+}
+
+//api to approve a book from an admin
+
+export const approveBookApi = async(reqBody,reqHeader) => {
+    return await commonApi('PUT',`${serverUrl}/approve-book`,reqBody, reqHeader)
+}
+
+export const getAllUsersApi = async(reqHeader) => {
+    return await commonApi('GET', `${serverUrl}/all-users`,'', reqHeader)
+
+}
+
+//api to add the jobs
+export const addJobApi = async(reqBody) =>{
+    return await commonApi("POST",`${serverUrl}/add-job`,reqBody)
+}

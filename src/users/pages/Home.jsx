@@ -1,14 +1,21 @@
-import React,{useEffect, useState} from 'react';
+import React,{useEffect, useState , useContext} from 'react';
 import Header from '../components/Header';
 import Footer from '../../components/Footer';
 import  { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
 import { Link } from 'react-router-dom';
 import { homeBookApi} from '../../../services/allApi';
+import { searchKeyContext } from '../../context/contextShare'
+import { toast, ToastContainer} from 'react-toastify'
+import { useNavigate
 
+ } from 'react-router-dom';
 function Home() {
-
+ const navigate = useNavigate();
  const [homeBook, setHomeBook] = useState([])
+ const { searchKey , setSearchKey} = useContext(searchKeyContext)
+ const [token,setToken] = useState("")
+
  const getAllHomeBooks = async() => {
 	const result = await homeBookApi()
 	if(result.status == 200){
@@ -16,10 +23,36 @@ function Home() {
 	}
  }
 
- console.log(homeBook)
+//  console.log(homeBook)
  useEffect(()=> {
+	setSearchKey("")
 	getAllHomeBooks()
+	const TOKEN = sessionStorage.getItem("token")
+	if(TOKEN){
+		setToken(TOKEN)
+	}
  },[])
+
+ const handleSearch = () => {
+	if(!searchKey){
+		toast.error("please enter a book title")
+	}
+
+	if(!token){
+		toast.info("Please login")
+		setTimeout(()=>{
+			navigate('/login')
+		},1500)
+	}
+
+	if(searchKey && token){
+		setTimeout(()=>{
+			navigate('/allbooks')
+		},1500)
+	}else{
+		toast.error('something went wrong')
+	}
+ }
 
   return (
     <>
@@ -32,8 +65,11 @@ function Home() {
 			  	<h1 className="text-5xl" > Wonderful Gifts</h1>
 			  	<p className="text-2xl" > Give your family and friends a book </p>
 	  		<div className="flex items-center justify-center w-full">
-	  			<input type="text" placeholder="search  books" className="p-2 mt-4 bg-white border-radius rounded-3xl placeholder-gray-400 w-[90vw] md:w-full"/>
-	  			<FontAwesomeIcon className="text-blue-800" icon={faMagnifyingGlass} style={{ marginTop: '14px' , marginLeft: '-30px' }}/>
+	  			<input
+				type="text"
+				onChange={(e)=>{setSearchKey(e.target.value)}}
+				 placeholder="search  books" className="p-2 mt-4 bg-white text-black border-radius rounded-3xl placeholder-gray-400 w-[90vw] md:w-full"/>
+	  			<FontAwesomeIcon onClick={()=>{handleSearch()}} className="text-blue-800" icon={faMagnifyingGlass} style={{ marginTop: '14px' , marginLeft: '-30px' }}/>
 	  		</div>
 	  		</div>
 	  		<div></div>
@@ -153,7 +189,7 @@ function Home() {
 		</div>
 
 	  </section>
-
+	<ToastContainer theme="colored" position="top-center" autoClose={2000} />
 	<Footer />
     </>
   )

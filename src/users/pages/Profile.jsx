@@ -91,7 +91,7 @@ function Profile() {
           bookDetails.uploadedImg.forEach( item => reqBody.append("uploadedImages",item) )
          }
       }
-
+      console.log(reqBody)
       const result = await uploadBookApi(reqHeader,reqBody)
       console.log(result)
 

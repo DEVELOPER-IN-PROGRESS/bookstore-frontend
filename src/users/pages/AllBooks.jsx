@@ -132,7 +132,9 @@ function AllBooks() {
                         {
                             allBooks?.length>0?
                             allBooks?.map( item => (
-                                <div key={item._id} className="p-3 shadow-xl ">
+                                <div key={item._id}
+                                    hidden={item.status=="pending" || item.status =="sold"}
+                                    className={`p-3 shadow-xl`}>
                                     <Link to={`/view-book/${item._id}`}>
                                     <img src={item.imageUrl} alt="no image" style={{ width:'100%' ,height:'300px' }} className=""/>
                                     </Link>
