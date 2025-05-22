@@ -82,7 +82,7 @@ function Profile() {
       }
 
       const reqBody = new FormData()
-
+ 
       for (let key in bookDetails) {
          if(key != 'uploadedImg'){
             reqBody.append(key,bookDetails[key])

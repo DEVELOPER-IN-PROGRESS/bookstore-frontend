@@ -5,12 +5,16 @@ import AdminSidebar from '../components/AdminSidebar';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faLocationDot, faTrashCan, faXmark } from '@fortawesome/free-solid-svg-icons';
 import {toast , ToastContainer } from 'react-toastify'
-import { addJobApi } from '../../../services/allApi';
+import { addJobApi , deleteAJobApi, getAllJobsApi } from '../../../services/allApi';
 
 function AdminCareers() {
   const [modalStatus ,setModalStatus ] = useState(false)
   const [tab , setTab] = useState('job')
   const [token ,setToken] = useState("")
+  const [allJobs, setAllJobs] = useState([])
+  const [addStatus , setAddStatus] = useState(true)
+  const [deleteStatus, setDeleteStatus] = useState(true);
+  const [searchKey,setSearchKey] = useState("");
   const [jobDetails, setJobDetails] = useState({
     title:"",
     location:"",
@@ -40,9 +44,20 @@ function AdminCareers() {
       const reqHeader = {
       "Authotization": `Bearer ${token}`
     }
-
     const result = await addJobApi(jobDetails,reqHeader)
-    console.log(result)
+    // console.log(result)
+    if(result.status == 200){
+      const newList = [ ...allJobs,result.data]
+      setAllJobs(newList)
+      setAddStatus(!addStatus)
+    }
+  }
+
+  const fetchAllJobs = async(search) => {
+    const result = await getAllJobsApi(search);
+    if(result.status == 200){
+      setAllJobs(result.data)
+    }
   }
 
   const handleSubmit = () => {
@@ -56,12 +71,24 @@ function AdminCareers() {
      adminAddJob();
   }
 
+  const handleDelete = async(id) => {
+     console.log(id)
+     const result =  await deleteAJobApi(id)
+     console.log(result)
+    if (result.data == 200){
+       setDeleteStatus(!deleteStatus)
+    }
+  }
+
   useEffect(()=>{
     const tok = sessionStorage.getItem("token")
     if(tok){
       setToken(tok)
     }
-  },[])
+    fetchAllJobs(searchKey)
+  },[addStatus,searchKey,deleteStatus]) //allJobs, searchKey
+
+  console.log(allJobs)
 
   // console.log(jobDetails)
 
@@ -91,6 +118,8 @@ function AdminCareers() {
 
                             <div className="flex items-stretch h-[50px] justify-center">
                                 <input
+                                value={searchKey}
+                              onChange={(e)=>{setSearchKey(e.target.value)}}
                               type="text" placeholder='Job Title'
                               className="p-2 w-full placeholder-gray-600 w-[60%] md:w-full bg-white border-radius-0 border border-gray-300  search"
                               />
@@ -107,15 +136,16 @@ function AdminCareers() {
 
                          </div>
 
-                         <div className="p-4 md:px-0 md:py-5">
+                        {
+                         allJobs?.map( job => (
+                            <div className="p-4 md:px-0 md:py-5" key={job._id}>
                             <div className="shadow-2xl p-4 border-grey-400">
                                 <div className="flex flex-col py-5">
                                     <div>
-
                                       <div className="flex justify-between gap-x-4 items-center">
-                                        <h2 className=" text-underline">Job Title</h2>
+                                        <h2 className=" text-underline">{job?.title}</h2>
 
-                                        <button  className="bg-red-600 border hover:border-red-600 text-white hover:bg-white hover:text-red-500 p-4">
+                                        <button onClick={()=>{handleDelete(job._id)}} className="bg-red-600 border hover:border-red-600 text-white hover:bg-white hover:text-red-500 p-4">
                                             delete
                                             <FontAwesomeIcon className="ms-2" icon={faTrashCan} />
                                         </button>
@@ -124,20 +154,22 @@ function AdminCareers() {
 
                                         <p className="mt-3">
                                             <FontAwesomeIcon className='me-3 text-sky-500' icon={faLocationDot} />
-                                            Location
+                                           {job?.location}
                                         </p>
                                         <p className="mt-3">
-                                            Job Type: System Admin
+                                            Job Type: {job?.jobType}
                                         </p>
-                                        <p className="mt-3">Salary : 1156000 CTC</p>
-                                        <p className="mt-3"> Qualification :</p>
-                                        <p className="mt-3"> Experience </p>
-                                        <p>Description:  Lorem, ipsum dolor sit amet consectetur adipisicing elit. Totam odio debitis ut reprehenderit, ea assumenda ipsa nemo quibusdam. Commodi soluta repellendus fuga facilis laborum necessitatibus dolore eveniet sapiente quod! Delectus!</p>
+                                        <p className="mt-3">Salary : {job?.salary}</p>
+                                        <p className="mt-3"> Qualification : {job?.qualification}</p>
+                                        <p className="mt-3"> Experience: {job?.experience}</p>
+                                        <p>Description: {job?.description}</p>
                                     </div>
 
                                 </div>
                             </div>
                          </div>
+                         ))
+                        }
 
                       </div>
 

@@ -1,12 +1,29 @@
-import React, {useState} from 'react'
+import React, {useState , useEffect } from 'react'
 import Footer from '../../components/Footer'
 import Header from '../components/Header'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faArrowUpRightFromSquare, faLocationDot } from '@fortawesome/free-solid-svg-icons'
 import { faXmark } from '@fortawesome/free-solid-svg-icons'
+import { getAllJobsApi } from '../../../services/allApi'
 
 function Careers() {
   const [modalStatus , setModalStatus] = useState(false)
+  const [allJobs, setAllJobs] = useState([])
+  const [search,setSearch] = useState("")
+
+  const getAllJobs = async(search) => {
+     const result  = await getAllJobsApi(search)
+     console.log(result)
+     if(result.status ==200){
+        setAllJobs(result.data)
+     }
+  }
+
+  useEffect(()=>{
+    getAllJobs(search);
+  },[search])
+
+
   return (
     <>
      <Header/>
@@ -23,41 +40,52 @@ function Careers() {
          <h1 className="text-2xl">Current Openings </h1>
          <div className="mx-auto my-5 w-[50%] flex items-stretch h-[50px] justify-center">
                     <input
+                     value={search}
+                     onChange={(e)=>{setSearch(e.target.value)}}
                      type="text" placeholder='Search By Title'
                      className="p-2 w-full placeholder-gray-600 w-full bg-white border-radius-0 border border-dark  search"
                     />
-                    <button className="bg-green-500 px-2 w-[150px] md:w-[200px] text-white border hover:text-green-500 hover:bg-white">
+                    <button  className="bg-green-500 px-2 w-[150px] md:w-[200px] text-white border hover:text-green-500 hover:bg-white">
                         Search
                     </button>
          </div>
 
-         <div className="p-4 md:px-20 md:py-5">
-            <div className="shadow p-4 border-grey-400">
-                <div className="flex flex-col md:grid grid-cols-[8fr_1fr] py-5">
-                    <div>
-                        <h2 className="">Job Title</h2>
-                        <hr />
-                        <p className="mt-3">
-                            <FontAwesomeIcon icon={faLocationDot} />
-                            Kochi
-                        </p>
-                        <p className="mt-3">
-                            Job Type:
-                        </p>
-                        <p className="mt-3">Salary :</p>
-                        <p className="mt-3"> Qualification :</p>
-                        <p className="mt-3"> Experience </p>
-                        <p>Description:  Lorem, ipsum dolor sit amet consectetur adipisicing elit. Totam odio debitis ut reprehenderit, ea assumenda ipsa nemo quibusdam. Commodi soluta repellendus fuga facilis laborum necessitatibus dolore eveniet sapiente quod! Delectus!</p>
+
+         {
+          allJobs?.length >0?
+
+          allJobs?.map( job => (
+                  <div className="p-4 md:px-20 md:py-5" key={job._id}>
+                    <div className="shadow p-4 border-grey-400">
+                        <div className="flex flex-col md:grid grid-cols-[8fr_1fr] py-5">
+                            <div>
+                                <h2 className="">{job.title}</h2>
+                                <hr />
+                                <p className="mt-3">
+                                    <FontAwesomeIcon icon={faLocationDot} />
+                                    {job.location}
+                                </p>
+                                <p className="mt-3">
+                                    Job Type: {job.jobType}
+                                </p>
+                                <p className="mt-3">Salary : {job.salary}</p>
+                                <p className="mt-3"> Qualification : {job.qualification}</p>
+                                <p className="mt-3"> Experience: {job.experience} </p>
+                                <p>Description:  Lorem, ipsum dolor sit amet consectetur adipisicing elit. Totam odio debitis ut reprehenderit, ea assumenda ipsa nemo quibusdam. Commodi soluta repellendus fuga facilis laborum necessitatibus dolore eveniet sapiente quod! Delectus!</p>
+                            </div>
+                            <div>
+                                <button onClick={()=>{setModalStatus(!modalStatus)}} className="ms-0 mt-4 md:ms-2 md:mt-0 bg-blue-900 border hover:border-blue-900 text-white hover:bg-white hover:text-blue-900 p-4">
+                                    Apply
+                                    <FontAwesomeIcon className="ms-2" icon={faArrowUpRightFromSquare} />
+                                </button>
+                            </div>
+                        </div>
                     </div>
-                    <div>
-                        <button onClick={()=>{setModalStatus(!modalStatus)}} className="ms-0 mt-4 md:ms-2 md:mt-0 bg-blue-900 border hover:border-blue-900 text-white hover:bg-white hover:text-blue-900 p-4">
-                            Apply
-                            <FontAwesomeIcon className="ms-2" icon={faArrowUpRightFromSquare} />
-                        </button>
-                    </div>
-                </div>
-            </div>
-         </div>
+                  </div>
+          ))
+         :
+         <p>No Jobs Available at the moment</p>
+         }
 
       </div>
 

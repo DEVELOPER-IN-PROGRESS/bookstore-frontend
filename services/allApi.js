@@ -54,3 +54,13 @@ export const getAllUsersApi = async(reqHeader) => {
 export const addJobApi = async(reqBody) =>{
     return await commonApi("POST",`${serverUrl}/add-job`,reqBody)
 }
+
+//api to get all the jobs list from backend
+export const getAllJobsApi = async(search) =>{
+    return await commonApi('GET',`${serverUrl}/all-jobs?search=${search}`)
+}
+
+// api to delete a job by admin
+export const deleteAJobApi = async(id) => {
+    return await commonApi('DELETE',`${serverUrl}/delete-job/${id}`)
+}
