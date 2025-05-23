@@ -5,7 +5,9 @@ import AdminSidebar from '../components/AdminSidebar';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faLocationDot, faTrashCan, faXmark } from '@fortawesome/free-solid-svg-icons';
 import {toast , ToastContainer } from 'react-toastify'
-import { addJobApi , deleteAJobApi, getAllJobsApi } from '../../../services/allApi';
+import { addJobApi , deleteAJobApi, getAllJobsApi , getAllApplicationsApi } from '../../../services/allApi';
+import {Link } from 'react-router-dom'
+import { serverUrl } from '../../../services/serverurl';
 
 function AdminCareers() {
   const [modalStatus ,setModalStatus ] = useState(false)
@@ -15,6 +17,8 @@ function AdminCareers() {
   const [addStatus , setAddStatus] = useState(true)
   const [deleteStatus, setDeleteStatus] = useState(true);
   const [searchKey,setSearchKey] = useState("");
+  const [allApplications , setAllApplications] = useState([])
+  const [applicationStatus,setApplicationStatus] = useState(false)
   const [jobDetails, setJobDetails] = useState({
     title:"",
     location:"",
@@ -38,6 +42,14 @@ function AdminCareers() {
       experience:"",
       description:"",
     })
+  }
+
+  const getAllApplications = async() => {
+    const result = await getAllApplicationsApi()
+    console.log(result)
+    if(result.status == 200){
+      setAllApplications(result.data)
+    }
   }
 
   const adminAddJob = async() => {
@@ -85,8 +97,10 @@ function AdminCareers() {
     if(tok){
       setToken(tok)
     }
+
     fetchAllJobs(searchKey)
-  },[addStatus,searchKey,deleteStatus]) //allJobs, searchKey
+    getAllApplications()
+  },[addStatus,searchKey,deleteStatus,applicationStatus]) //allJobs, searchKey
 
   console.log(allJobs)
 
@@ -171,17 +185,64 @@ function AdminCareers() {
                          ))
                         }
 
-                      </div>
+                </div>
+
+            <div className='px-5 md:px-10 my-5 md:my-10'>
+              <div className="my-5 flex justify-center items-center w-full">
+                <input type="text" placeholder='Search by tittle' className='text-gray-600 border border-gray-500 w-1/2 py-2 placeholder-gray-500 px-5' />
+                <button className='bg-green-600 text-white px-5 py-2 border border-green-600 hover:border-green-600 hover:text-green-600 hover:bg-white'>Search</button>
+              </div>
+              <div className='md:flex justify-center items-center my-5 md:my-10 overflow-auto'>
+                <table className='shadow-2xl'>
+                  <thead className=' bg-gray-200'>
+                    <tr>
+                      <th className='px-5 py-3 border border-gray-300'>Sl.No</th>
+                      <th className='px-5 py-3 border border-gray-300'>Full Name</th>
+                      <th className='px-5 py-3 border border-gray-300'>Job Tittle</th>
+                      {/* <th className='px-5 py-3 border border-gray-300'>Job Tittle</th> */}
+                      <th className='px-5 py-3 border border-gray-300'>Coverletter</th>
+                      <th className='px-5 py-3 border border-gray-300'>Qualification</th>
+                      <th className='px-5 py-3 border border-gray-300'>Phone</th>
+                      <th className='px-5 py-3 border border-gray-300'>Email</th>
+                      <th className='px-5 py-3 border border-gray-300'>Resume</th>
+                    </tr>
+                  </thead>
+                  <tbody className='bg-gray-50'>
+                    {
+                      allApplications?.map( (item,idx) => (
+                          <tr key={item._id}>
+                            <td className='px-5 py-3 border border-gray-200'>{idx+1}</td>
+                            <td className='px-5 py-3 border border-gray-200'>{item.fullname}</td>
+                            <td className='px-5 py-3 border border-gray-200'>{item.jobtitle}</td>
+                            {/* <td className='px-5 py-3 border border-gray-200'>{item.jobtitle}</td> */}
+                            <td className='px-5 py-3 border border-gray-200'>{item.coverletter}</td>
+                            <td className='px-5 py-3 border border-gray-200'>{item.qualification}</td>
+                            <td className='px-5 py-3 border border-gray-200'>{item.phone}</td>
+                            <td className='px-5 py-3 border border-gray-200'>{item.email}</td>
+                            <td className='px-5 py-3 border border-gray-200'>
+                              <Link to={`${serverUrl}/pdfuploads/${item?.resume}`} target="_blank" className="text-blue-600 underline">
+                                {item?.resume}
+                              </Link>
+                            </td>
+                          </tr>
+                      ))
+                    }
+
+
+                  </tbody>
+                </table>
+              </div>
+            </div>
 
             </div>
 
+
+
         </div>
 
-    {
-          modalStatus &&
-
+        {
+        modalStatus &&
         <div className="relative z-10" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-
 
         <div className="fixed inset-0 bg-gray-500/75 transition-opacity" aria-hidden="true"></div>
 
@@ -217,8 +278,9 @@ function AdminCareers() {
             </div>
           </div>
         </div>
+      }
 
-        }
+
     <ToastContainer theme="colored" position="top-center" autoClose={2000} />
     <Footer />
     </>

@@ -64,3 +64,14 @@ export const getAllJobsApi = async(search) =>{
 export const deleteAJobApi = async(id) => {
     return await commonApi('DELETE',`${serverUrl}/delete-job/${id}`)
 }
+
+//api to apply for a job
+export const addApplicationApi  = async (reqHeader,reqBody) => {
+    return await commonApi('POST',`${serverUrl}/apply-job`,reqBody,reqHeader);
+}
+
+//api to get all the applications from the users
+
+export const getAllApplicationsApi = async() => {
+    return await commonApi('GET',`${serverUrl}/all-application`)
+}

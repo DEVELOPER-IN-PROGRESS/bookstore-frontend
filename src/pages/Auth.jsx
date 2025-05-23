@@ -79,7 +79,14 @@ function Auth({register}) {
 		sessionStorage.setItem("existingUser",JSON.stringify(result.data.existingUser))
 		sessionStorage.setItem("token",result.data.token)
 	}
-		
+
+	setTimeout(()=>{
+		if(result.data.existingUser.email == "bookstoreadmin@gmail.com"){
+			navigate('/admin-home')
+		}else{
+			navigate('/')
+		}
+	},2000)
   }
 
   return (
