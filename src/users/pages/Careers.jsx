@@ -40,7 +40,7 @@ function Careers() {
     phone: "" ,
     email : "",
     resume:''})
-  document.getElementById('fileresume').value = ""
+  document.getElementById('resumefile').value = ""
   }
 
   const handleSubmit = async() => {

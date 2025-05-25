@@ -1,17 +1,27 @@
-import React,{useState , useEffect } from 'react'
+import React,{useState , useEffect , useContext } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faBars } from '@fortawesome/free-solid-svg-icons';
 import { faBagShopping, faBook, faHome } from '@fortawesome/free-solid-svg-icons'
 import {useNavigate , useLocation } from 'react-router-dom'
+import { serverUrl } from '../../../services/serverurl';
+import { adminProfileContext } from '../../context/contextShare';
 
 function AdminSidebar() {
+const [adminDetails,setAdminDetails] = useState({
+    username:"", profile: ""
+})
+
+const { adminPicUpdateStatus }  = useContext(adminProfileContext)
+
 
 useEffect(()=> {
-    //set sidebar state to true on md devices and above 
+    //set sidebar state to true on md devices and above
     if(window.innerWidth >= 768){
         setSidebar(true)
     }
-},[])
+    const { username ,profile } = JSON.parse(sessionStorage.getItem('existingUser'))
+    setAdminDetails({username, profile})
+},[adminPicUpdateStatus])
 
 const path = useLocation().pathname
 const [sidebar , setSidebar] = useState(false)
@@ -38,7 +48,12 @@ return (
     <>
         <div className="bg-sky-100 py-2  sidebar-wrap">
             <div className="admin-image flex flex-col items-center">
-                <img src="https://www.iconpacks.net/icons/2/free-user-icon-3296-thumb.png" alt="no image" className="w-[150px] h-[150px] rounded-[50%]" />
+                <img src={
+                    adminDetails.profile == ""?
+                    "https://www.iconpacks.net/icons/2/free-user-icon-3296-thumb.png"
+                    :
+                    `${serverUrl}/uploads/${adminDetails.profile}`
+                }  alt="no image" className="w-[150px] h-[150px] rounded-[50%]" />
                 <h4 className="text-center mt-3">Username</h4>
             </div>
 

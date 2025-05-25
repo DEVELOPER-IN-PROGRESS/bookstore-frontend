@@ -75,3 +75,9 @@ export const addApplicationApi  = async (reqHeader,reqBody) => {
 export const getAllApplicationsApi = async() => {
     return await commonApi('GET',`${serverUrl}/all-application`)
 }
+
+//api to update the profile in the backend
+
+export const updateProfileApi = async(reqBody , reqHeader) => {
+    return await commonApi('PUT', `${serverUrl}/admin-profile-update`, reqBody, reqHeader )
+}
