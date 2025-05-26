@@ -36,15 +36,13 @@ function EditProfile({profileUpdateStatus, setProfileUpdateStatus}) {
   console.log(userDetails)
 
   useEffect(()=>{
-
       const user = JSON.parse(sessionStorage.getItem('existingUser'))
       console.log(sessionStorage.getItem('token'))
       console.log({user})
       if(user){
-        const profilePic = user.profile? `${serverUrl}/uploads/${user.profile}`: user.profile
-
+        const profilePic = user.profile == ""? user.profile: `${serverUrl}/uploads/${user.profile}`
         setUserDetails({ username: user.username, password: user.password ,
-        cpassword: user.password , bio : user.bio , profile: profilePic })
+        cpassword: user.password , bio : user.bio , profile: user.profile })
         setExistingUserDetails({ username: user.username, password: user.password ,
         cpassword: user.password , bio : user.bio , profile: profilePic })
       }
@@ -52,12 +50,9 @@ function EditProfile({profileUpdateStatus, setProfileUpdateStatus}) {
   },[updateStatus])
 
   const handleImage = (e) => {
-
     const newImage = e.target.files[0]
     console.log(newImage)
-
     setUserDetails({...userDetails,profile:newImage})
-
     const url = URL.createObjectURL(newImage)
     console.log(url)
     setImgPreview(url)
@@ -76,7 +71,6 @@ function EditProfile({profileUpdateStatus, setProfileUpdateStatus}) {
   const handleSubmit = async () => {
       const { username , password ,cpassword, profile ,bio } = userDetails
       console.log({ username , password ,cpassword, profile ,bio })
-
       if(!password || !username || !cpassword){
         toast.info('username and passwords cannot be blank')
       }
@@ -104,13 +98,13 @@ function EditProfile({profileUpdateStatus, setProfileUpdateStatus}) {
               username:user.username,
               password:user.password
             })
-
             const sessionUser = JSON.parse(sessionStorage.getItem('existingUser'))
             console.log(sessionUser)
             sessionStorage.setItem("existingUser",JSON.stringify({...sessionUser,
             username:user.username,bio:user.bio, profile:user.profile, password:user.password}))
             setUpdateStatus(!updateStatus)
             setProfileUpdateStatus(!profileUpdateStatus)
+            // toast.success('profile updation successful')
         }else{
           toast.error('something went wrong')
           handleReset();
@@ -139,13 +133,7 @@ function EditProfile({profileUpdateStatus, setProfileUpdateStatus}) {
                   <img src={ imgPreview? `${imgPreview}`
                     :
                     existingUserDetails.profile? `${existingUserDetails.profile}`
-                    // :
-                    // imgPreview? `${imgPreview}`
                     : "https://www.iconpacks.net/icons/2/free-user-icon-3296-thumb.png"
-                  //   userDetails.profile? `${imgPreview}` :
-                  //  existingUserDetails.profile? `${existingUserDetails.profile}`
-                  //  :
-                  // "https://www.iconpacks.net/icons/2/free-user-icon-3296-thumb.png"
                 }
                   alt="no image" className="w-[200px] h-[200px] rounded-[50%]" />
                 <div className="bg-yellow-300 text-white p-2 rounded absolute right-[10px] bottom-0" style={{}}>
@@ -176,9 +164,10 @@ function EditProfile({profileUpdateStatus, setProfileUpdateStatus}) {
                 </div>
               </div>
           </div>
-          <ToastContainer theme="colored" position="top-center" autoClose={2000} />
+          <ToastContainer theme="colored" position="top-center" autoClose={500} />
       </div>
       }
+
     </>
   )
 }
