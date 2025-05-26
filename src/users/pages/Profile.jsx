@@ -6,6 +6,8 @@ import { faCircleCheck, faSquarePlus } from '@fortawesome/free-solid-svg-icons'
 import EditProfile from '../components/EditProfile'
 import { uploadBookApi } from '../../../services/allApi'
 import {toast , ToastContainer } from 'react-toastify'
+import { serverUrl } from '../../../services/serverurl'
+
 
 function Profile() {
   const [sellstatus , setSellstatus] = useState(true);
@@ -29,7 +31,12 @@ function Profile() {
   const [imagePreview, setImagePreview] = useState('')
   const [previewList  , setPreviewList] = useState([]);
   const [token,setToken] = useState("")
-
+  const [userData, setUserData] = useState({
+    username:"",
+    profile:"",
+    bio:""
+  })
+  const [profileUpdateStatus,setProfileUpdateStatus] = useState(false)
   console.log(bookDetails)
   const [isOpen , setIsOpen]  = useState(false);
 
@@ -82,7 +89,7 @@ function Profile() {
       }
 
       const reqBody = new FormData()
- 
+
       for (let key in bookDetails) {
          if(key != 'uploadedImg'){
             reqBody.append(key,bookDetails[key])
@@ -106,26 +113,43 @@ function Profile() {
     if(sessionStorage.getItem("token")){
       setToken(sessionStorage.getItem("token"))
     }
-  },[])
+
+    const user = JSON.parse(sessionStorage.getItem('existingUser'))
+    if(user){
+      //uploads folder
+      const profilePic = user.profile? `${serverUrl}/uploads/${user.profile}`: user.profile
+      setUserData({
+        profile:  profilePic,
+        username: user.username,
+        bio: user.bio
+      })
+    }
+
+  },[profileUpdateStatus])
 
   return (
     <>
       <Header />
       <div className=' w-full bg-gray-900' style={{ height: '200px' }}></div>
             <div style={{ width: '230px', height: '230px', borderRadius: '50%', marginLeft: '70px', marginTop: '-130px' }} className='bg-white p-3 flex justify-center items-center'>
-                <img src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png" alt="" style={{ width: '200px', height: '200px', borderRadius: '50%' }} />
+                <img src={
+                  userData.profile? userData.profile
+                  :
+                  "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png"}
+                   alt="no image" style={{ width: '200px', height: '200px', borderRadius: '50%' }} />
             </div>
         <div>
 
         <div className='flex justify-between px-25 mt-5'>
             <p className='flex justify-center items-center'>
-                <span className='text-3xl '>Johns Joseph </span>
+                <span className='text-3xl '> { userData.username } </span>
                 <FontAwesomeIcon icon={faCircleCheck} className='text-blue-400 ms-3'/>
             </p>
-            <EditProfile/>
+            <EditProfile profileUpdateStatus={profileUpdateStatus} setProfileUpdateStatus={setProfileUpdateStatus} />
         </div>
 
-        <p className="text-center text-2xl"> Lorem ipsum dolor sit amet consectetur adipisicing elit. Qui quae reiciendis modi beatae odio aperiam, sapiente fugit reprehenderit illum culpa, quaerat, nostrum accusantium. Libero harum, officia odit saepe in autem!
+        <p className="px-2 lg:px-10 xl:px-20 text-justify text-2xl">
+           { userData.bio } Lorem, ipsum dolor sit amet consectetur adipisicing elit. Enim repellendus fugit ullam officiis itaque delectus ducimus, quam ipsum esse fuga voluptas, dolore, quidem quibusdam asperiores sunt eligendi labore odio earum.
         </p>
 
         <div className="flex justify-center items-center my-10 md:px-40">
@@ -281,9 +305,8 @@ function Profile() {
         {
           purchasestatus &&  <div>purchase status</div>
         }
-        <ToastContainer theme="colored" position="top-center" autoClose={2000} />
         </div>
-
+      <ToastContainer theme="colored" position="top-center" autoClose={2000} />
       <Footer />
     </>
   )
