@@ -10,6 +10,7 @@ import { faCamera } from '@fortawesome/free-solid-svg-icons/faCamera'
 import { serverUrl } from '../../../services/serverurl'
 import { makePaymentApi } from '../../../services/allApi'
 import { loadStripe } from '@stripe/stripe-js'
+import {toast, ToastContainer} from 'react-toastify'
 
 function Viewbook() {
     const { id } = useParams()
@@ -18,18 +19,42 @@ function Viewbook() {
     const [token ,setToken] = useState('')
 
     const API_SECRET= import.meta.env.VITE_STRIPE_SK
-    const API_PUBLIC = import.meta.env.VITE_STRIPE_SK
+    const API_PUBLIC = import.meta.env.VITE_STRIPE_PK
 
     const viewABook = async(id) => {
        const result  = await ViewSingleBookApi(id);
-       console.log(result)
+      //  console.log(result)
        setViewBookDetails(result.data)
     }
 
     const makePayment = async()=>{
       console.log(viewbookDetails)
 
-      const stripe = await loadStripe()
+      const stripe = await loadStripe(API_PUBLIC)
+      // console.log(viewbookDetails)
+
+      const reqHeader = {
+        "Authorization": `Bearer ${token}`
+      }
+
+      const reqBody = {
+        bookDetails: viewbookDetails
+      }
+
+      const result = await makePaymentApi(reqHeader,reqBody)
+      console.log(result)
+
+      const { sessionId, existingBook } = result.data;
+      console.log(sessionId)
+      console.log(existingBook)
+
+      const response = stripe.redirectToCheckout({
+         sessionId: sessionId,
+      });
+      if(response.error){
+          toast.error('something went wrong with the payment')
+      }
+
     }
 
  useEffect(()=>{
@@ -47,35 +72,35 @@ function Viewbook() {
         <div className='md:grid grid-cols-[1fr_3fr] '>
 
                 <div className='mb-8 md:mb-0 cursor-pointer'>
-                    <img src={ viewbookDetails?.imageUrl || "https://m.media-amazon.com/images/I/81l3rZK4lnL.jpg"} alt={viewbookDetails?.title} className='w-full h-full' />
+                    <img src={ viewbookDetails?.imageUrl || "https://m.media-amazon.com/images/I/81l3rZK4lnL.jpg" } alt={viewbookDetails?.title} className='w-full h-full' />
                 </div>
 
 
             <div className='md:px-8 relative'>
                 <h1 className='font-bold text-md md:text-2xl text-center mb-2 md:mb-3'>{viewbookDetails?.title}</h1>
-                <p className='text-blue-500 text-center'>Lorem ipsum dolor </p>
+                <p className='text-blue-500 text-center'> { viewbookDetails?.author } </p>
 
                 <div className='md:flex space-y-3 md:space-y-0 justify-between items-center gap-5 mt-13'>
                     <div className='flex flex-col  space-y-3'>
-                        <p className='font-bold '>Publisher : Penguin Life</p>
-                         <p className='font-bold '>Seller Mail : max@gmail.com</p>
+                        <p className='font-bold '>Publisher : { viewbookDetails?.publisher } </p>
+                         <p className='font-bold '>Seller Mail : { viewbookDetails?.userMail }</p>
 
                     </div>
 
                      <div className='flex flex-col space-y-3'>
-                        <p className='font-bold '> Language : English</p>
-                         <p className='font-bold '>Real Price : $15</p>
+                        <p className='font-bold '> Language : { viewbookDetails?.language }</p>
+                         <p className='font-bold '>Real Price : ${ viewbookDetails?.dprice } </p>
 
                     </div>
 
                      <div className='flex flex-col space-y-3'>
-                        <p className='font-bold '>No. of pages : 208</p>
-                         <p className='font-bold '>ISBN : 978-0143130727</p>
+                        <p className='font-bold '>No. of pages : { viewbookDetails?.noofpages }</p>
+                         <p className='font-bold '>ISBN : { viewbookDetails?.isbn }</p>
 
                     </div>
                 </div>
 
-                <div className='mt-8 md:mt-15 font-bold  text-justify'>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Voluptatem velit dolore veniam et fuga eius unde aspernatur facilis assumenda ratione! Deserunt doloremque voluptates hic minima adipisci cupiditate atque necessitatibus repudiandae Lorem ipsum dolor sit amet consectetur, adipisicing elit. Eos quia officia exercitationem incidunt maiores assumenda excepturi? Dignissimos, voluptatem itaque sapiente dolorum saepe cupiditate dolorem recusandae tenetur, nemo enim dolore! Ratione..</div>
+                <div className='mt-8 md:mt-15 font-bold  text-justify'>{ viewbookDetails?.abstract }</div>
 
                 <div className='flex justify-between md:justify-end gap-5 mt-8 md:mt-35 items-center'>
 
@@ -86,9 +111,11 @@ function Viewbook() {
                 </button>
                 </Link>
 
-                <button className=' px-8 md:px-5 py-3 text-white bg-green-600 rounded'>Buy ₹399</button>
+                <button type="button" onClick={makePayment} className=' px-8 md:px-5 py-3 text-white bg-green-600 rounded'>Buy { viewbookDetails?.dprice }</button>
             </div>
-            <div  onClick={()=>setBookPhoto(!bookphoto)} className='absolute top-0 text-gray-300 text-xl right-2'><FontAwesomeIcon icon={faEye} /></div>
+            <div  onClick={()=>setBookPhoto(!bookphoto)} className='absolute top-0 text-gray-300 text-xl right-2'>
+              <FontAwesomeIcon icon={faEye} />
+            </div>
 
             </div>
 
@@ -126,7 +153,7 @@ function Viewbook() {
     </div>
   </div>
 )}
-
+    <ToastContainer theme='colored' position='top-center' autoClose={1400} />
     <Footer/>
 
     </>

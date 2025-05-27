@@ -324,7 +324,7 @@ function Profile() {
                 {
                   userbooks?.length >0 ?
                   userbooks.map( item => (
-                    <div className="bg-gray-200 p-4 rounded  mx-auto lg:w-[1000px] mb-4">
+                    <div key={item._id} className="bg-gray-200 p-4 rounded  mx-auto lg:w-[1000px] mb-4">
                       <div className="flex flex-col md:grid md:grid-cols-[3fr_1fr]">
 
                           <div className="px-4">
@@ -370,9 +370,9 @@ function Profile() {
           purchasestatus &&
            <div className="p-10 my-20 shadow rounded">
                 {
-                  // userBrought?.length == 0?
-                    // userBrought?.map( item => (
-                     <div className="bg-gray-200 p-4 rounded  mx-auto lg:w-[1000px] mb-4">
+                  userBrought?.length?
+                    userBrought?.map( item => (
+                     <div key={item._id} className="bg-gray-200 p-4 rounded  mx-auto lg:w-[1000px] mb-4">
                       <div className="flex flex-col md:grid md:grid-cols-[3fr_1fr]">
 
                           <div className="px-4">
@@ -402,13 +402,13 @@ function Profile() {
                         <button type="button" onClick={()=>{deleteBook(item?._id)}} className='p-2 bg-red-600 rounded rounded-5 text-white hover:bg-white hover:text-red-600 border hover:border-red-600'>Delete</button>
                       </div>
                     </div>
-                    // ))
-                  // :
-                  // <div className="flex justify-center items-center flex-col">
-                  //    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRj7SJDQ5Ih5QY_T68ZIWG6pBQXC2_egNPJ-A&s"
-                  //     alt="no books image" className="w-[120px]" />
-                  //    <p>no brought books</p>
-                  // </div>
+                    ))
+                  :
+                  <div className="flex justify-center items-center flex-col">
+                     <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRj7SJDQ5Ih5QY_T68ZIWG6pBQXC2_egNPJ-A&s"
+                      alt="no books image" className="w-[120px]" />
+                     <p>no brought books</p>
+                  </div>
                 }
           </div>
         }
