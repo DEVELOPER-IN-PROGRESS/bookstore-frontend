@@ -18,8 +18,7 @@ function Viewbook() {
     const [viewbookDetails , setViewBookDetails] = useState({})
     const [token ,setToken] = useState('')
 
-    // const API_PUBLIC = import.meta.env.VITE_STRIPE_PK
-    const API_PUBLIC = 'pk_test_51RSy1p4e6JDIDllwkP8Vi6v37ijtEOZBADx9gQYnS5DMLqBjejRJNVLo1GeoBYY6zWDuO8VYgsaMpt5pYDbdZOut00MJ6rjJ90'
+    const str_pk = '' 
 
     const viewABook = async(id) => {
        const result  = await ViewSingleBookApi(id);
@@ -30,7 +29,7 @@ function Viewbook() {
     const makePayment = async()=>{
       console.log(viewbookDetails)
 
-      const stripe = await loadStripe(API_PUBLIC)
+      const stripe = await loadStripe(str_pk)
       // console.log(viewbookDetails)
 
       const reqHeader = {
