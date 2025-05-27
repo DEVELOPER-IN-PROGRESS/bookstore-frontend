@@ -33,12 +33,12 @@ function EditProfile({profileUpdateStatus, setProfileUpdateStatus}) {
   const [imgPreview , setImgPreview] = useState("")
   const [updateStatus , setUpdateStatus] = useState(false)
 
-  console.log(userDetails)
+  // console.log(userDetails)
 
   useEffect(()=>{
       const user = JSON.parse(sessionStorage.getItem('existingUser'))
-      console.log(sessionStorage.getItem('token'))
-      console.log({user})
+      // console.log(sessionStorage.getItem('token'))
+      // console.log({user})
       if(user){
         const profilePic = user.profile == ""? user.profile: `${serverUrl}/uploads/${user.profile}`
         setUserDetails({ username: user.username, password: user.password ,
@@ -51,10 +51,10 @@ function EditProfile({profileUpdateStatus, setProfileUpdateStatus}) {
 
   const handleImage = (e) => {
     const newImage = e.target.files[0]
-    console.log(newImage)
+    // console.log(newImage)
     setUserDetails({...userDetails,profile:newImage})
     const url = URL.createObjectURL(newImage)
-    console.log(url)
+    // console.log(url)
     setImgPreview(url)
   }
 
@@ -70,7 +70,7 @@ function EditProfile({profileUpdateStatus, setProfileUpdateStatus}) {
 
   const handleSubmit = async () => {
       const { username , password ,cpassword, profile ,bio } = userDetails
-      console.log({ username , password ,cpassword, profile ,bio })
+      // console.log({ username , password ,cpassword, profile ,bio })
       if(!password || !username || !cpassword){
         toast.info('username and passwords cannot be blank')
       }
@@ -85,9 +85,9 @@ function EditProfile({profileUpdateStatus, setProfileUpdateStatus}) {
         for(let key in userDetails){
           reqBody.append(key , userDetails[key])
         }
-        console.log(reqBody)
+        // console.log(reqBody)
         const result = await updateProfileApi(reqBody, reqHeader,'user')
-        console.log(result)
+        // console.log(result)
 
         if(result.status == 200 ){
             const user = result.data
@@ -99,7 +99,7 @@ function EditProfile({profileUpdateStatus, setProfileUpdateStatus}) {
               password:user.password
             })
             const sessionUser = JSON.parse(sessionStorage.getItem('existingUser'))
-            console.log(sessionUser)
+            // console.log(sessionUser)
             sessionStorage.setItem("existingUser",JSON.stringify({...sessionUser,
             username:user.username,bio:user.bio, profile:user.profile, password:user.password}))
             setUpdateStatus(!updateStatus)

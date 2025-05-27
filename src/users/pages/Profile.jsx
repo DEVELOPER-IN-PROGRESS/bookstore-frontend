@@ -4,7 +4,7 @@ import Footer from '../../components/Footer'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCircleCheck, faSquarePlus } from '@fortawesome/free-solid-svg-icons'
 import EditProfile from '../components/EditProfile'
-import { uploadBookApi } from '../../../services/allApi'
+import { deleteUserBookApi, getAllUserBooksApi, getAllUserBroughtBookApi, uploadBookApi } from '../../../services/allApi'
 import {toast , ToastContainer } from 'react-toastify'
 import { serverUrl } from '../../../services/serverurl'
 
@@ -27,6 +27,7 @@ function Profile() {
     category:"",
     uploadedImg: [],
   });
+  const item = null
 
   const [imagePreview, setImagePreview] = useState('')
   const [previewList  , setPreviewList] = useState([]);
@@ -37,8 +38,10 @@ function Profile() {
     bio:""
   })
   const [profileUpdateStatus,setProfileUpdateStatus] = useState(false)
-  console.log(bookDetails)
+  // console.log(bookDetails)
   const [isOpen , setIsOpen]  = useState(false);
+  const [userbooks, setUserBooks] = useState([])
+  const [ userBrought, setUserBrought] = useState([])
 
   const handleUpload = (e) => {
     console.log(e)
@@ -106,14 +109,42 @@ function Profile() {
 
       }
     }
+  }
 
+  const getAllUserBroughtBook = async() => {
+      const reqHeader = {
+      "Authorization": `Bearer ${token}`
+    }
+
+     const result = await getAllUserBroughtBookApi(reqHeader)
+     console.log(result);
+     if(result.status ==200){
+       setUserBrought(result.data)
+     }
+  }
+
+  const getallUserBook = async ()=>{
+    const reqHeader = {
+      "Authorization": `Bearer ${token}`
+    }
+
+     const result = await getAllUserBooksApi(reqHeader)
+     console.log(result);
+     if(result.status == 200){
+        setUserBooks(result.data)
+     }
+  }
+
+  const deleteBook = async(id) =>{
+    const result = await deleteUserBookApi(id)
+    console.log(result)
   }
 
   useEffect(()=>{
     if(sessionStorage.getItem("token")){
       setToken(sessionStorage.getItem("token"))
     }
-
+    // console.log(token)
     const user = JSON.parse(sessionStorage.getItem('existingUser'))
     if(user){
       //uploads folder
@@ -126,6 +157,20 @@ function Profile() {
     }
 
   },[profileUpdateStatus])
+
+  useEffect(()=>{
+    if(bookstatus){
+      getallUserBook()
+    }
+    else if(purchasestatus){
+      getAllUserBroughtBook()
+    }else{
+      console.log('something went wrong')
+      // toast.warning('something went wrong')
+    }
+
+  },[bookstatus])
+
 
   return (
     <>
@@ -153,16 +198,16 @@ function Profile() {
         </p>
 
         <div className="flex justify-center items-center my-10 md:px-40">
-            <p onClick={()=>{setBookstatus(true); setSellstatus(false); setPurchasestatus(false)}} className={ `${sellstatus? 'p-4 text-blue-600 border-l border-t border-r border-gray-200 rounded ' : 'p-4 text-black border-b border-gray-200' }  cursor-pointer `} >sell book  </p>
+            <p onClick={()=>{setBookstatus(false); setSellstatus(true); setPurchasestatus(false)}} className={ `${sellstatus? 'p-4 text-blue-600 border-l border-t border-r border-gray-200 rounded ' : 'p-4 text-black border-b border-gray-200' }  cursor-pointer `} >sell book  </p>
 
 
-            <p onClick={()=>{setBookstatus(false); setSellstatus(true); setPurchasestatus(false)}} className={ `${bookstatus? 'p-4 text-black border-b border-gray-200 '
+            <p onClick={()=>{setBookstatus(true); setSellstatus(false); setPurchasestatus(false)}} className={ `${bookstatus? 'p-4 text-black border-b border-gray-200 '
             :'p-4 text-black border-b border-gray-200 '
-            } cursor-pointer` }> sold hisory </p>
+            } cursor-pointer` }> book status </p>
 
             <p onClick={()=>{setBookstatus(false); setSellstatus(false); setPurchasestatus(true)}} className={ `${purchasestatus}? 'p-4 text-black border-b border-gray-200 ':'p-4 text-blue-600 border-l border-t border-r border-gray-200 rounded' cursor-pointer`} >
               Purchase  history
-              </p>
+            </p>
 
         </div>
 
@@ -275,35 +320,97 @@ function Profile() {
         }
         {
           bookstatus &&
+            <div className="p-10 my-5 shadow rounded">
+                {
+                  userbooks?.length >0 ?
+                  userbooks.map( item => (
+                    <div className="bg-gray-200 p-4 rounded  mx-auto lg:w-[1000px] mb-4">
+                      <div className="flex flex-col md:grid md:grid-cols-[3fr_1fr]">
 
-          <div className="bg-gray-200 p-4 rounded  mx-auto lg:w-[1000px]">
-              <div className="flex flex-col md:grid md:grid-cols-[3fr_1fr]">
+                          <div className="px-4">
+                            <h1 className="text-2xl capitalize">{item?.title}</h1>
+                            <h2 className="title text-1xl capitalize">{item?.author}</h2>
+                            <h3 className="text-black">
+                              {item?.abstract}
+                            </h3>
+                          </div>
 
-                  <div className="px-4">
-                    <h1 className="text-2xl capitalize">The book thief</h1>
-                    <h2 className="title text-1xl capitalize">marcus zusak</h2>
-                    <h3 className="text-black">
-                    The Book Thief is a historical fiction novel by the Australian author Markus Zusak, set in Nazi Germany during World War II. Published in 2005, The Book Thief became an international bestseller and was translated into 63 languages and sold 17 million copies. It was adapted into the 2013 feature film, The Book Thief
-                    </h3>
+                          <div>
+                            <img src={item?.imageUrl} alt="no image" className="" />
+                          </div>
+                      </div>
+
+                      <div className="flex items-center w-full justify-between mt-5">
+                        <div className="flex">
+                          {
+                            item.status =="pending"?
+                            <img src="https://www.psdstamps.com/wp-content/uploads/2022/04/round-pending-stamp-png.png" alt="book status" className="w-[100px] " />
+                            :item.status == 'approved'?
+                            <img src="https://i.pinimg.com/736x/06/19/87/06198767cf5f2b1f6ab40fb66cea9737.jpg" alt="book status" className="w-[100px] " />
+                            :
+                            <img src="https://www.onlygfx.com/wp-content/uploads/2017/12/sold-stamp-3.png" alt="book status" className="w-[100px] " />
+                          }
+                        </div>
+                        <button type="button" onClick={()=>{deleteBook(item?._id)}} className='p-2 bg-red-600 rounded rounded-5 text-white hover:bg-white hover:text-red-600 border hover:border-red-600'>Delete</button>
+                      </div>
+                    </div>
+                  ))
+                  :
+                  <div className="flex justify-center items-center flex-col">
+                     <img src="https://img.freepik.com/premium-vector/vector-warning-sign-prohibited-from-carrying-books-stacking-books_550971-597.jpg"
+                      alt="no books image" className="w-[120px]" />
+                     <p className="text-red-600 text-2xl">
+                       No Books Added
+                     </p>
                   </div>
-
-                  <div>
-                    <img src="https://m.media-amazon.com/images/I/91ndEtx1uWL._AC_UF894,1000_QL80_.jpg" alt="no image" className="" />
-                  </div>
-              </div>
-
-              <div className="flex items-center w-full justify-between mt-5">
-                <div className="flex">
-                   <img src="https://i.pinimg.com/736x/06/19/87/06198767cf5f2b1f6ab40fb66cea9737.jpg" alt="book status" className="w-[40px] " />
-                   <img src="https://www.psdstamps.com/wp-content/uploads/2022/04/round-pending-stamp-png.png" alt="book status" className="w-[40px] " />
-                   <img src="https://www.onlygfx.com/wp-content/uploads/2017/12/sold-stamp-3.png" alt="book status" className="w-[40px] " />
-                </div>
-                <button className='p-2 bg-red-600 rounded rounded-5 text-white hover:bg-white hover:text-red-600 border hover:border-red-600'>Delete</button>
-              </div>
-          </div>
+                }
+            </div>
         }
         {
-          purchasestatus &&  <div>purchase status</div>
+          purchasestatus &&
+           <div className="p-10 my-20 shadow rounded">
+                {
+                  // userBrought?.length == 0?
+                    // userBrought?.map( item => (
+                     <div className="bg-gray-200 p-4 rounded  mx-auto lg:w-[1000px] mb-4">
+                      <div className="flex flex-col md:grid md:grid-cols-[3fr_1fr]">
+
+                          <div className="px-4">
+                            <h1 className="text-2xl capitalize">{item?.title}</h1>
+                            <h2 className="title text-1xl capitalize">{item?.author}</h2>
+                            <h3 className="text-black">
+                              {item?.abstract}
+                            </h3>
+                          </div>
+
+                          <div>
+                            <img src={item?.imageUrl} alt="no image" className="" />
+                          </div>
+                      </div>
+
+                      <div className="flex items-center w-full justify-between mt-5">
+                        <div className="flex">
+                          {
+                            item?.status =="pending"?
+                            <img src="https://www.psdstamps.com/wp-content/uploads/2022/04/round-pending-stamp-png.png" alt="book status" className="w-[100px] " />
+                            :item?.status == 'approved'?
+                            <img src="https://i.pinimg.com/736x/06/19/87/06198767cf5f2b1f6ab40fb66cea9737.jpg" alt="book status" className="w-[100px] " />
+                            :
+                            <img src="https://www.onlygfx.com/wp-content/uploads/2017/12/sold-stamp-3.png" alt="book status" className="w-[100px] " />
+                          }
+                        </div>
+                        <button type="button" onClick={()=>{deleteBook(item?._id)}} className='p-2 bg-red-600 rounded rounded-5 text-white hover:bg-white hover:text-red-600 border hover:border-red-600'>Delete</button>
+                      </div>
+                    </div>
+                    // ))
+                  // :
+                  // <div className="flex justify-center items-center flex-col">
+                  //    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRj7SJDQ5Ih5QY_T68ZIWG6pBQXC2_egNPJ-A&s"
+                  //     alt="no books image" className="w-[120px]" />
+                  //    <p>no brought books</p>
+                  // </div>
+                }
+          </div>
         }
         </div>
       <ToastContainer theme="colored" position="top-center" autoClose={2000} />

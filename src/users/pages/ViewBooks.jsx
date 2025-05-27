@@ -8,11 +8,17 @@ import Footer from '../../components/Footer'
 import { ViewSingleBookApi } from '../../../services/allApi'
 import { faCamera } from '@fortawesome/free-solid-svg-icons/faCamera'
 import { serverUrl } from '../../../services/serverurl'
+import { makePaymentApi } from '../../../services/allApi'
+import { loadStripe } from '@stripe/stripe-js'
 
 function Viewbook() {
     const { id } = useParams()
     const [bookphoto, setBookPhoto]= useState(false)
     const [viewbookDetails , setViewBookDetails] = useState({})
+    const [token ,setToken] = useState('')
+
+    const API_SECRET= import.meta.env.VITE_STRIPE_SK
+    const API_PUBLIC = import.meta.env.VITE_STRIPE_SK
 
     const viewABook = async(id) => {
        const result  = await ViewSingleBookApi(id);
@@ -20,10 +26,20 @@ function Viewbook() {
        setViewBookDetails(result.data)
     }
 
+    const makePayment = async()=>{
+      console.log(viewbookDetails)
+
+      const stripe = await loadStripe()
+    }
+
  useEffect(()=>{
    viewABook(id)
+   if(sessionStorage.getItem('token')){
+      const token = sessionStorage.getItem('token')
+      setToken(token)
+   }
  },[])
-console.log(viewbookDetails)
+
   return (
     <>
     <Header/>

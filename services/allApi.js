@@ -84,3 +84,18 @@ export const updateProfileApi = async(reqBody , reqHeader , user ) => {
     return await commonApi('PUT', `${serverUrl}/admin-profile-update`, reqBody, reqHeader )
 }
 
+export const getAllUserBroughtBookApi = async(reqHeader) => {
+    return await commonApi('GET', `${serverUrl}/user-brought-books`, '', reqHeader)
+}
+
+export const getAllUserBooksApi  = async(reqHeader) => {
+    return await commonApi ('GET',`${serverUrl}/user-books`, '', reqHeader)
+}
+
+export const deleteUserBookApi = async(id ) => {
+    return await commonApi ('DELETE',`${serverUrl}/delete-user-books/${id}`,'','')
+}
+
+export const makePaymentApi = async(reqHeader, reqBody) => {
+    return await commonApi('PUT',`${serverUrl}/make-payment`,reqBody,reqHeader)
+}

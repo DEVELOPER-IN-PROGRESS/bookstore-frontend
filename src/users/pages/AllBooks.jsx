@@ -22,7 +22,7 @@ function AllBooks() {
         }
 
         const result = await getAllBookApi(searchKey, reqHeader)
-        // console.log(result)
+        console.log(result)
 
         if(result.status == 200){
             setAllBooks(result.data)
@@ -41,13 +41,13 @@ function AllBooks() {
     }
 
     useEffect(()=>{
+        console.log('useEffect loaded')
         const TOKEN = sessionStorage.getItem("token")
         if(TOKEN){
           setToken(TOKEN)
           getAllBooks(TOKEN, searchKey)
         }
       },[searchKey])
-
 
   return (
     <>
