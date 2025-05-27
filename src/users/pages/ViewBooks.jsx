@@ -18,7 +18,7 @@ function Viewbook() {
     const [viewbookDetails , setViewBookDetails] = useState({})
     const [token ,setToken] = useState('')
 
-    const str_pk = '' 
+    const API_PUBLIC = import.meta.env.VITE_STRIPE_PK
 
     const viewABook = async(id) => {
        const result  = await ViewSingleBookApi(id);
@@ -29,7 +29,7 @@ function Viewbook() {
     const makePayment = async()=>{
       console.log(viewbookDetails)
 
-      const stripe = await loadStripe(str_pk)
+      const stripe = await loadStripe(API_PUBLIC)
       // console.log(viewbookDetails)
 
       const reqHeader = {
