@@ -18,7 +18,6 @@ function Viewbook() {
     const [viewbookDetails , setViewBookDetails] = useState({})
     const [token ,setToken] = useState('')
 
-    const API_SECRET= import.meta.env.VITE_STRIPE_SK
     const API_PUBLIC = import.meta.env.VITE_STRIPE_PK
 
     const viewABook = async(id) => {

@@ -27,7 +27,6 @@ function Profile() {
     category:"",
     uploadedImg: [],
   });
-  const item = null
 
   const [imagePreview, setImagePreview] = useState('')
   const [previewList  , setPreviewList] = useState([]);
