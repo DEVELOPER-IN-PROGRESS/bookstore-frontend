@@ -11,10 +11,12 @@ function PaymentError() {
                     <p className='text-3xl'>We apologize for the inconvenience caused. Kindly Visit the bookstore for further
                         actions
                     </p>
+                    <Link to='/allbooks'>
                     <button type="button" className="bg-blue-500 px-4 py-3 text-white my-5">
                         <FontAwesomeIcon icon={faBackward} className="me-2 "/>
                         Explore more books
                     </button>
+                    </Link>
                 </div>
                 <div className="flex justify-center items-center">
                     <img  src="https://i.pinimg.com/originals/9d/16/7e/9d167e72839894c971c90f60ab00d916.gif" alt="no image" className="success" />
