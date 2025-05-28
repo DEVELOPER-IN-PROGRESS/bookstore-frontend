@@ -1,7 +1,7 @@
 import { faPen, faPenToSquare, faXmark } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import React,{useState ,useContext , useEffect} from 'react'
-import { adminProfileContext } from '../../context/contextShare'
+import { adminProfileContext } from '../../context/ContextShare'
 import {updateProfileApi} from '../../../services/allApi'
 import { ToastContainer , toast} from 'react-toastify'
 import { serverUrl } from '../../../services/serverurl'

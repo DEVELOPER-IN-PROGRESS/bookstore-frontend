@@ -7,7 +7,7 @@ import { faPen } from '@fortawesome/free-solid-svg-icons';
 import { toast , ToastContainer } from 'react-toastify' ;
 import { updateProfileApi } from '../../../services/allApi';
 import {serverUrl} from '../../../services/serverurl'
-import { adminProfileContext } from '../../context/contextShare';
+import { adminProfileContext } from '../../context/ContextShare';
 
 
 function AdminSettings() {

@@ -4,7 +4,7 @@ import { faBars } from '@fortawesome/free-solid-svg-icons';
 import { faBagShopping, faBook, faHome } from '@fortawesome/free-solid-svg-icons'
 import {useNavigate , useLocation } from 'react-router-dom'
 import { serverUrl } from '../../../services/serverurl';
-import { adminProfileContext } from '../../context/contextShare';
+import { adminProfileContext } from '../../context/ContextShare';
 
 function AdminSidebar() {
 const [adminDetails,setAdminDetails] = useState({
